@@ -125,32 +125,6 @@ pub fn Cabecalho() -> impl IntoView {
 }
 
 #[component]
-fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
-    let ping_action = Action::new(|paciente: &PacienteCadastroSummary| {
-        let paciente = paciente.clone();
-        async move { srv_paciente_cadastro_summary_ping(paciente).await }
-    });
-
-    let paciente = paciente.clone();
-    let _ = ping_action.dispatch(paciente);
-
-    view! {
-        <Suspense>
-
-            <p>
-                Server Ping:
-                {move || {
-                    let ping_result = ping_action.value().get();
-                    tracing::debug!("ping_result: {:#?}", ping_result);
-                    ping_result.map(|result| result.unwrap_or_default()).unwrap_or_default()
-                }}
-            </p>
-
-        </Suspense>
-    }
-}
-
-#[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
     let Sidebar = || {
         let evolucao_id = query_evolucao_id();
@@ -181,60 +155,30 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
     }
 }
 
-type PacienteId = String;
-type EvolucaoId = String;
+#[component]
+fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
+    let ping_action = Action::new(|paciente: &PacienteCadastroSummary| {
+        let paciente = paciente.clone();
+        async move { srv_paciente_cadastro_summary_ping(paciente).await }
+    });
 
-pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
-    Memo::new(|_| Ok(PacienteId::from("pppppppp")))
-}
+    let paciente = paciente.clone();
+    let _ = ping_action.dispatch(paciente);
 
-pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
-    Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")))
-}
+    view! {
+        <Suspense>
 
-pub fn get_paciente_cadastro_summary(
-    query_id: MaybeSignal<Result<PacienteId, String>>,
-) -> Resource<Result<PacienteCadastroSummary, String>> {
-    Resource::new(
-        move || query_id.get(),
-        |query_id| async move {
-            match query_id {
-                Ok(paciente_id) => srv_load_paciente_cadastro_summary(paciente_id)
-                    .await
-                    .map_err(|e| e.to_string()),
-                Err(e) => Err(e),
-            }
-        },
-    )
-}
+            <p>
+                Server Ping:
+                {move || {
+                    let ping_result = ping_action.value().get();
+                    tracing::debug!("ping_result: {:#?}", ping_result);
+                    ping_result.map(|result| result.unwrap_or_default()).unwrap_or_default()
+                }}
+            </p>
 
-pub fn get_evolucao(
-    evolucao_id: MaybeSignal<Result<EvolucaoId, String>>,
-) -> Resource<Result<EvolucaoSoapFull, String>> {
-    Resource::new(
-        move || evolucao_id.get(),
-        |query_id| async move {
-            match query_id {
-                Ok(evolucao_id) => srv_load_evolucao(evolucao_id)
-                    .await
-                    .map_err(|e| e.to_string()),
-                Err(e) => Err(e),
-            }
-        },
-    )
-}
-
-#[server(LoadPacienteCadastroSummarySrv)]
-pub async fn srv_load_paciente_cadastro_summary(
-    paciente_id: PacienteId,
-) -> Result<PacienteCadastroSummary, ServerFnError<String>> {
-    // fake API delay
-    tokio::time::sleep(std::time::Duration::from_millis(250)).await;
-
-    Ok(PacienteCadastroSummary {
-        id: paciente_id,
-        nome: Some("John Doe".to_string()),
-    })
+        </Suspense>
+    }
 }
 
 #[server(PacienteCadastroSummaryPingSrv)]
@@ -252,15 +196,54 @@ pub async fn srv_paciente_cadastro_summary_ping(
         + status)
 }
 
+type PacienteId = String;
+type EvolucaoId = String;
+
+pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
+    Memo::new(|_| Ok(PacienteId::from("pppppppp")))
+}
+
+pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
+    Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")))
+}
+
+pub fn get_paciente_cadastro_summary(
+    paciente_id: MaybeSignal<Result<PacienteId, String>>,
+) -> Resource<Result<PacienteCadastroSummary, ServerFnError<String>>> {
+    Resource::new(
+        move || paciente_id.get(),
+        |_| async move { srv_load_paciente_cadastro_summary().await },
+    )
+}
+
+pub fn get_evolucao(
+    evolucao_id: MaybeSignal<Result<EvolucaoId, String>>,
+) -> Resource<Result<EvolucaoSoapFull, ServerFnError<String>>> {
+    Resource::new(
+        move || evolucao_id.get(),
+        |_| async move { srv_load_evolucao().await },
+    )
+}
+
+#[server(LoadPacienteCadastroSummarySrv)]
+pub async fn srv_load_paciente_cadastro_summary(
+) -> Result<PacienteCadastroSummary, ServerFnError<String>> {
+    // fake API delay
+    tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+
+    Ok(PacienteCadastroSummary {
+        id: PacienteId::from("pppppppp"),
+        nome: Some("John Doe".to_string()),
+    })
+}
+
 #[server(LoadLastEvolucaoSrv)]
-async fn srv_load_evolucao(
-    evolucao_id: EvolucaoId,
-) -> Result<EvolucaoSoapFull, ServerFnError<String>> {
+async fn srv_load_evolucao() -> Result<EvolucaoSoapFull, ServerFnError<String>> {
     // fake API delay
     tokio::time::sleep(std::time::Duration::from_millis(250)).await;
 
     Ok(EvolucaoSoapFull {
-        id: evolucao_id,
+        id: EvolucaoId::from("eeeeeeee"),
         paciente_id: PacienteId::from("pppppppp"),
     })
 }
