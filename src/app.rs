@@ -2,7 +2,6 @@ use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags};
 use leptos_router::{components::*, path, MatchNestedRoutes, params::Params, hooks::use_params};
 
-use crate::ids::*;
 use time::{Date, OffsetDateTime};
 use serde::{Serialize, Deserialize};
 use leptos::either::Either;
@@ -216,6 +215,9 @@ fn DrawerGeneric(sidebar: impl IntoView) -> impl IntoView {
     }
 } 
 
+type PacienteId = String;
+type EvolucaoId = String;
+type AtendimentoId = String;
 
 pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
     let params = use_params::<PacienteParams>();
