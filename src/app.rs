@@ -50,7 +50,7 @@ fn Home() -> impl IntoView {
 
 #[component]
 pub fn VisualizarEvolucao() -> impl IntoView {
-    let evolucao_id = query_evolucao_id();
+    let evolucao_id = Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")));
 
     let evolucao = get_evolucao(evolucao_id.into());
 
@@ -79,7 +79,7 @@ pub fn VisualizarEvolucao() -> impl IntoView {
 
 #[component]
 pub fn Cabecalho() -> impl IntoView {
-    let paciente_id = query_paciente_id();
+    let paciente_id = Memo::new(|_| Ok(PacienteId::from("pppppppp")));
     let paciente = get_paciente_cadastro_summary(paciente_id.into());
 
     view! {
@@ -127,7 +127,7 @@ pub fn Cabecalho() -> impl IntoView {
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
     let Sidebar = || {
-        let evolucao_id = query_evolucao_id();
+        let evolucao_id = Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")));
 
         let _evolucao = get_evolucao(evolucao_id.into());
 
@@ -198,14 +198,6 @@ pub async fn srv_paciente_cadastro_summary_ping(
 
 type PacienteId = String;
 type EvolucaoId = String;
-
-pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
-    Memo::new(|_| Ok(PacienteId::from("pppppppp")))
-}
-
-pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
-    Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")))
-}
 
 pub fn get_paciente_cadastro_summary(
     paciente_id: MaybeSignal<Result<PacienteId, String>>,
