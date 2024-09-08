@@ -50,12 +50,7 @@ fn Home() -> impl IntoView {
 
 #[component]
 pub fn VisualizarEvolucao() -> impl IntoView {
-    let evolucao_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(EvolucaoId::from("eeeeeeee")));
-
-    let evolucao = Resource::new(
-        move || evolucao_id.get(),
-        |_| async move { srv_load_evolucao().await },
-    );
+    let evolucao = Resource::new(move || (), |_| async move { srv_load_evolucao().await });
 
     view! {
         <Suspense>
@@ -82,9 +77,8 @@ pub fn VisualizarEvolucao() -> impl IntoView {
 
 #[component]
 pub fn Cabecalho() -> impl IntoView {
-    let paciente_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(PacienteId::from("pppppppp")));
     let paciente = Resource::new(
-        move || paciente_id.get(),
+        move || (),
         |_| async move { srv_load_paciente_cadastro_summary().await },
     );
 
@@ -133,12 +127,7 @@ pub fn Cabecalho() -> impl IntoView {
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
     let Sidebar = || {
-        let evolucao_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(EvolucaoId::from("eeeeeeee")));
-
-        let _evolucao = Resource::new(
-            move || evolucao_id.get(),
-            |_| async move { srv_load_evolucao().await },
-        );
+        let _evolucao = Resource::new(move || (), |_| async move { srv_load_evolucao().await });
 
         view! {
             <Suspense>
