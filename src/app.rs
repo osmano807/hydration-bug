@@ -111,6 +111,12 @@ pub fn Cabecalho() -> impl IntoView {
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
     let Sidebar = || {
+        // If I comment this line, the hydration bug *doesn't* manifest, but we
+        // have a tachys panic at the browser console
+        /*
+           panicked at /home/opc/.cargo/git/checkouts/leptos-2c8932a5258b3db6/4dea1195e233/tachys/src/html/element/mod.rs:382:61:
+           called `Option::unwrap()` on a `None` value
+        */
         let _evolucao = Resource::new(move || (), |_| async move { srv_load_evolucao().await });
 
         view! {
@@ -120,7 +126,7 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
         }
     };
 
-    // Works
+    // Works (does not manifest bug)
     /*
      view! {
          <Outlet />
