@@ -117,6 +117,7 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                 tracing::debug!("paciente: {:#?}", paciente);
                 match (paciente) {
                     (Some(Ok(paciente))) => {
+                        let paciente_clone = paciente.clone();
                         tracing::debug!("paciente: {:#?}", paciente);
                         Either::Left({
                             view! {
@@ -130,8 +131,9 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                                         .unwrap_or_default()}
                                 </p>
                                 <p>CPF: {paciente.cpf}</p>
+                                <PingResult paciente=paciente_clone />
                                 <p>
-                                    Data Status:
+                                    Client Side Data Status:
                                     {move || {
                                         if paciente.id.to_string() == "pppppppp" {
                                             tracing::debug!("Data Status CORRECT");
@@ -155,6 +157,34 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
             }}
         </Suspense>
     }
+}
+
+#[component]
+fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
+    let ping_action = Action::new(|paciente: &PacienteCadastroSummary| {
+        let paciente = paciente.clone();
+        async move {        
+            srv_paciente_cadastro_summary_ping(paciente).await
+    }});
+
+    let paciente = paciente.clone();
+    let _ = ping_action.dispatch(paciente);
+
+    view! {
+        <Suspense>
+
+            <p>
+                Server Ping:
+                {move || {
+                    let ping_result = ping_action.value().get();
+                    tracing::debug!("ping_result: {:#?}", ping_result);
+                    ping_result.map(|result| result.unwrap_or_default()).unwrap_or_default()
+                }}
+            </p>
+
+        </Suspense>
+    }
+    
 }
 
 #[component]
@@ -255,6 +285,16 @@ pub async fn srv_load_paciente_cadastro_summary(
         cpf: Some("999.999.999-99".to_string()),
     })
 
+}
+
+#[server(PacienteCadastroSummaryPingSrv)]
+pub async fn srv_paciente_cadastro_summary_ping(paciente: PacienteCadastroSummary) -> Result<String, ServerFnError<String>> {
+    let status = if paciente.id.to_string() == "pppppppp" {
+        "CORRECT"
+    } else {
+        "INCORRECT"
+    };
+    Ok("Pong paciente_id: ".to_string() + &paciente.id.to_string() + "; Server Side Data Status: " + status)
 }
 
 #[server(LoadLastEvolucaoSrv)]
