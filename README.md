@@ -48,6 +48,10 @@ paciente: Some(
     ),
 )
 ```
+4. Note the browser output:
+  ![firefox_LQo00m9UMb](https://github.com/user-attachments/assets/bcb734ad-96a3-43a6-902a-ba1132ac8602) <br />
+  Should be: <br />
+  ![9z12njg72E](https://github.com/user-attachments/assets/8d636ba3-f5b7-4d82-8a01-e399f09b2c78)
 
 ## Potential Causes
 
