@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags};
-use leptos_router::{components::*, path, MatchNestedRoutes, params::Params, hooks::use_params};
+use leptos_router::{components::*, path, params::Params, hooks::use_params};
 
 use serde::{Serialize, Deserialize};
 use leptos::either::Either;
@@ -32,26 +32,17 @@ pub fn App() -> impl IntoView {
             <Routes fallback=|| {
                 view! {}
             }>
-                <EvolucoesMemberRouter />
+                <ParentRoute path=path!("") view=DrawerAtendimentosMember>
+                    <Route
+                        path=path!(
+                            "/pacientes/:paciente_id/atendimentos/:atendimento_id/evolucoes/:evolucao_id"
+                        )
+                        view=VisualizarEvolucao
+                    />
+                </ParentRoute>
             </Routes>
         </Router>
     }
-}
-
-#[component]
-fn EvolucoesMemberRouter() -> impl MatchNestedRoutes<Dom> + Clone {
-    view! {
-        <Route path=path!("") view=Home />
-        <ParentRoute path=path!("") view=DrawerAtendimentosMember>
-            <Route
-                path=path!(
-                    "/pacientes/:paciente_id/atendimentos/:atendimento_id/evolucoes/:evolucao_id"
-                )
-                view=VisualizarEvolucao
-            />
-        </ParentRoute>
-    }
-    .into_inner()
 }
 
 #[component]
@@ -121,7 +112,7 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                         Either::Left({
                             view! {
                                 <p>Paciente: {paciente.nome}</p>
-                                <p>Id: {paciente.id.to_string()}</p>                        
+                                <p>Id: {paciente.id.to_string()}</p>
                                 <PingResult paciente=paciente_clone />
                                 <p>
                                     Client Side Data Status:
@@ -180,31 +171,24 @@ fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
 
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
-    view! { <DrawerGeneric sidebar=SidebarAtendimentosMember /> }
-}
+    let sidebar = || {
+        let evolucao_id = query_evolucao_id();
 
-#[component]
-fn SidebarAtendimentosMember() -> impl IntoView {
-    let evolucao_id = query_evolucao_id();
+        let evolucao = get_evolucao(evolucao_id.into());
+    
+        view! {
+            <Suspense>
+                <p>SIDEBAR</p>
+            </Suspense>
+        }
+    };
 
-    let evolucao = get_evolucao(evolucao_id.into());
-
-    view! {
-        <Suspense>
-            <p>SIDEBAR</p>
-        </Suspense>
-    }
-}
-
-
-#[component]
-fn DrawerGeneric(sidebar: impl IntoView) -> impl IntoView {
     view! {
         <Outlet />
 
         {sidebar}
     }
-} 
+}
 
 type PacienteId = String;
 type EvolucaoId = String;
