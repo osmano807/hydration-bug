@@ -1,0 +1,300 @@
+use leptos::prelude::*;
+use leptos_meta::{provide_meta_context, MetaTags};
+use leptos_router::{components::*, path, MatchNestedRoutes, params::Params, hooks::use_params};
+
+use crate::ids::*;
+use time::{Date, OffsetDateTime};
+use serde::{Serialize, Deserialize};
+use leptos::either::Either;
+
+pub fn shell(options: LeptosOptions) -> impl IntoView {
+    view! {
+        <!DOCTYPE html> 
+        <html lang="en">
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <AutoReload options=options.clone() />
+                <HydrationScripts options />
+                <MetaTags />
+            </head>
+            <body>
+                <App />
+            </body>
+        </html>
+    }
+}
+
+#[component]
+pub fn App() -> impl IntoView {
+    provide_meta_context();
+
+    view! {
+        <Router>
+            <Routes fallback=|| {
+                view! {}
+            }>
+                <EvolucoesMemberRouter />
+            </Routes>
+        </Router>
+    }
+}
+
+#[component]
+fn EvolucoesMemberRouter() -> impl MatchNestedRoutes<Dom> + Clone {
+    view! {
+        <Route path=path!("") view=Home />
+        <ParentRoute path=path!("") view=DrawerAtendimentosMember>
+            <Route
+                path=path!(
+                    "/pacientes/:paciente_id/atendimentos/:atendimento_id/evolucoes/:evolucao_id"
+                )
+                view=VisualizarEvolucao
+            />
+        </ParentRoute>
+    }
+    .into_inner()
+}
+
+#[component]
+fn Home() -> impl IntoView {
+    view! {
+        <A href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/odz3esz5">
+            Go to the bug page (client side navigation)
+        </A>
+        <br />
+        <a href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/odz3esz5">
+            Go to the bug page (browser native navigation)
+        </a>
+    }
+}
+
+
+
+#[component]
+pub fn VisualizarEvolucao() -> impl IntoView {
+    let evolucao_id = query_evolucao_id();
+
+    let evolucao = get_evolucao(evolucao_id.into());
+
+    view! {
+        <Suspense>
+            {move || {
+                let evolucao = evolucao.get();
+                match (evolucao) {
+                    (Some(Ok(evolucao))) => {
+                        Either::Left(
+                            view! {
+                                <h1 class="text-2xl font-bold">Evolução</h1>
+                                <Cabecalho />
+                            },
+                        )
+                    }
+                    _ => Either::Right(view! { <div>Erro ao carregar evolução</div> }),
+                }
+            }}
+        </Suspense>
+        <A href="/">Go to the home page</A>
+        <br />
+        <a href="/">Go to the home page (browser native navigation)</a>
+    }
+}
+
+#[component]
+pub fn Cabecalho() -> impl IntoView {
+    CabecalhoPacienteAtendimento()
+}
+
+#[component]
+pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
+    let paciente_id = query_paciente_id();
+    let paciente = get_paciente_cadastro_summary(paciente_id.into());
+
+    view! {
+        <Suspense>
+            {move || {
+                let paciente = paciente.get();
+                tracing::debug!("paciente: {:#?}", paciente);
+                match (paciente) {
+                    (Some(Ok(paciente))) => {
+                        tracing::debug!("paciente: {:#?}", paciente);
+                        Either::Left({
+                            view! {
+                                <p>Paciente: {paciente.nome}</p>
+                                <p>Id: {paciente.id.to_string()}</p>
+                                <p>
+                                    Data de nascimento:
+                                    {paciente
+                                        .data_nascimento
+                                        .map(|date| date.to_string())
+                                        .unwrap_or_default()}
+                                </p>
+                                <p>CPF: {paciente.cpf}</p>
+                                <p>
+                                    Data Status:
+                                    {move || {
+                                        if paciente.id.to_string() == "pppppppp" {
+                                            tracing::debug!("Data Status CORRECT");
+                                            Either::Left(view! { <span>CORRECT</span> })
+                                        } else {
+                                            tracing::debug!("Data Status INCORRECT");
+                                            Either::Right(view! { <span>INCORRECT</span> })
+                                        }
+                                    }}
+                                </p>
+                                {move || {
+                                    tracing::warn!(
+                                        "paciente id correct?: {:#?}", paciente.id.to_string() == "pppppppp"
+                                    )
+                                }}
+                            }
+                        })
+                    }
+                    _ => Either::Right(view! { <div>Erro ao carregar paciente</div> }),
+                }
+            }}
+        </Suspense>
+    }
+}
+
+#[component]
+pub fn DrawerAtendimentosMember() -> impl IntoView {
+    view! { <DrawerGeneric sidebar=SidebarAtendimentosMember /> }
+}
+
+#[component]
+fn SidebarAtendimentosMember() -> impl IntoView {
+    let evolucao_id = query_evolucao_id();
+
+    let evolucao = get_evolucao(evolucao_id.into());
+
+    view! {
+        <Suspense>
+            <p>SIDEBAR</p>
+        </Suspense>
+    }
+}
+
+
+#[component]
+fn DrawerGeneric(sidebar: impl IntoView) -> impl IntoView {
+    view! {
+        <Outlet />
+
+        {sidebar}
+    }
+} 
+
+
+pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
+    let params = use_params::<PacienteParams>();
+
+    Memo::new(move |_| params.get().map(|p| p.paciente_id).map_err(|e| e.to_string()))
+}
+
+#[derive(Params, PartialEq, Clone)]
+struct PacienteParams {
+    paciente_id: PacienteId,
+}
+
+pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
+    let params = use_params::<EvolucaoParams>();
+
+    Memo::new(move |_| params.get().map(|p| p.evolucao_id).map_err(|e| e.to_string()))
+}
+
+#[derive(Params, PartialEq, Clone)]
+struct EvolucaoParams {
+    evolucao_id: EvolucaoId,
+}
+
+pub fn get_paciente_cadastro_summary(
+    query_id: MaybeSignal<Result<PacienteId, String>>,
+) -> Resource<Result<PacienteCadastroSummary, String>> {
+    Resource::new(
+        move || query_id.get(),
+        |query_id| async move {
+            match query_id {
+                Ok(paciente_id) => srv_load_paciente_cadastro_summary(paciente_id)
+                .await
+                .map_err(|e| e.to_string()),
+                Err(e) => Err(e),
+            }
+        },
+    )
+}
+
+
+pub fn get_evolucao(
+    evolucao_id: MaybeSignal<Result<EvolucaoId, String>>,
+) -> Resource<Result<EvolucaoSoapFull, String>> {
+    Resource::new(
+        move || evolucao_id.get(),
+        |query_id| async move {
+            match query_id {
+                Ok(evolucao_id) => srv_load_evolucao(evolucao_id)
+                    .await
+                    .map_err(|e| e.to_string()),
+                Err(e) => Err(e),
+            }
+        },
+    )
+}
+
+#[server(LoadPacienteCadastroSummarySrv)]
+pub async fn srv_load_paciente_cadastro_summary(
+    paciente_id: PacienteId,
+) -> Result<PacienteCadastroSummary, ServerFnError<String>> {
+    // fake API delay
+    tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+
+    Ok(PacienteCadastroSummary {
+        id: paciente_id,
+        nome: Some("John Doe".to_string()),
+        data_nascimento: Some(Date::from_calendar_date(1980, time::Month::January, 1).unwrap()),
+        cpf: Some("999.999.999-99".to_string()),
+    })
+
+}
+
+#[server(LoadLastEvolucaoSrv)]
+async fn srv_load_evolucao(
+    evolucao_id: EvolucaoId,
+) -> Result<EvolucaoSoapFull, ServerFnError<String>> {
+// fake API delay
+tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+
+Ok(EvolucaoSoapFull {
+    id: evolucao_id,
+    paciente_id: PacienteId::try_from("pppppppp").unwrap(),
+    atendimento_id: AtendimentoId::try_from("aaaaaaaa").unwrap(),
+    subjetivo: Some("Subjetivo".to_string()),
+    objetivo: Some("Objetivo".to_string()),
+    analise: Some("Análise".to_string()),
+    plano: Some("Plano".to_string()),
+    data_criacao: OffsetDateTime::now_utc(),
+    data_modificacao: OffsetDateTime::now_utc(),
+    
+})
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct PacienteCadastroSummary {
+    pub id: PacienteId,
+    pub nome: Option<String>,
+    pub data_nascimento: Option<Date>,
+    pub cpf: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct EvolucaoSoapFull {
+    pub id: EvolucaoId,
+    pub paciente_id: PacienteId,
+    pub atendimento_id: AtendimentoId,
+    pub subjetivo: Option<String>,
+    pub objetivo: Option<String>,
+    pub analise: Option<String>,
+    pub plano: Option<String>,
+    pub data_criacao: OffsetDateTime,
+    pub data_modificacao: OffsetDateTime,
+}
