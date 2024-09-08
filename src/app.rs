@@ -30,6 +30,7 @@ pub fn App() -> impl IntoView {
     view! {
         <Router>
             <Routes fallback=|| ()>
+                <Route path=path!("") view=Home />
                 <ParentRoute path=path!("") view=DrawerAtendimentosMember>
                     <Route
                         path=path!(
@@ -87,11 +88,6 @@ pub fn VisualizarEvolucao() -> impl IntoView {
 
 #[component]
 pub fn Cabecalho() -> impl IntoView {
-    CabecalhoPacienteAtendimento()
-}
-
-#[component]
-pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
     let paciente_id = query_paciente_id();
     let paciente = get_paciente_cadastro_summary(paciente_id.into());
 
