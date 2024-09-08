@@ -35,15 +35,6 @@ time = { version = "0.3.36", features = [
   "wasm-bindgen",
 ] }
 
-getrandom = { version = "0.2", features = [
-  "js",
-] } # https://github.com/rust-random/getrandom/issues/267
-
-
-#
-# Ids
-#
-nanoid = "0.4"
 
 [patch.crates-io]
 leptos = { git = "https://github.com/leptos-rs/leptos" }

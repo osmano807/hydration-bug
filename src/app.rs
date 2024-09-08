@@ -59,11 +59,11 @@ fn EvolucoesMemberRouter() -> impl MatchNestedRoutes<Dom> + Clone {
 #[component]
 fn Home() -> impl IntoView {
     view! {
-        <A href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/odz3esz5">
+        <A href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/eeeeeeee">
             Go to the bug page (client side navigation)
         </A>
         <br />
-        <a href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/odz3esz5">
+        <a href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/eeeeeeee">
             Go to the bug page (browser native navigation)
         </a>
     }
@@ -118,6 +118,7 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                 match (paciente) {
                     (Some(Ok(paciente))) => {
                         let paciente_clone = paciente.clone();
+                        let paciente_id_clone = paciente.id.clone();
                         tracing::debug!("paciente: {:#?}", paciente);
                         Either::Left({
                             view! {
@@ -146,7 +147,7 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                                 </p>
                                 {move || {
                                     tracing::warn!(
-                                        "paciente id correct?: {:#?}", paciente.id.to_string() == "pppppppp"
+                                        "paciente id correct?: {:#?}", paciente_id_clone.to_string() == "pppppppp"
                                     )
                                 }}
                             }
