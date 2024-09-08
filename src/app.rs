@@ -32,12 +32,7 @@ pub fn App() -> impl IntoView {
             <Routes fallback=|| ()>
                 <Route path=path!("") view=Home />
                 <ParentRoute path=path!("") view=DrawerAtendimentosMember>
-                    <Route
-                        path=path!(
-                            "/bug"
-                        )
-                        view=VisualizarEvolucao
-                    />
+                    <Route path=path!("/bug") view=VisualizarEvolucao />
                 </ParentRoute>
             </Routes>
         </Router>
@@ -47,13 +42,9 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Home() -> impl IntoView {
     view! {
-        <A href="/bug">
-            Go to the bug page (client side navigation)
-        </A>
+        <A href="/bug">Go to the bug page (client side navigation)</A>
         <br />
-        <a href="/bug">
-            Go to the bug page (browser native navigation)
-        </a>
+        <a href="/bug">Go to the bug page (browser native navigation)</a>
     }
 }
 
@@ -175,12 +166,12 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
 
     // Works
     /*
-    view! {
-        <Outlet />
+     view! {
+         <Outlet />
 
-        <Sidebar />
-    }
-   */
+         <Sidebar />
+     }
+    */
 
     // Don't work (manifests bug)
     view! {
@@ -194,15 +185,11 @@ type PacienteId = String;
 type EvolucaoId = String;
 
 pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
-    Memo::new( |_| {
-        Ok(PacienteId::from("pppppppp"))
-    })
+    Memo::new(|_| Ok(PacienteId::from("pppppppp")))
 }
 
 pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
-    Memo::new(|_| {
-        Ok(EvolucaoId::from("eeeeeeee"))
-    })
+    Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")))
 }
 
 pub fn get_paciente_cadastro_summary(
