@@ -1,9 +1,9 @@
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags};
-use leptos_router::{components::*, path, params::Params, hooks::use_params};
+use leptos_router::{components::*, hooks::use_params, params::Params, path};
 
-use serde::{Serialize, Deserialize};
 use leptos::either::Either;
+use serde::{Deserialize, Serialize};
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -57,8 +57,6 @@ fn Home() -> impl IntoView {
         </a>
     }
 }
-
-
 
 #[component]
 pub fn VisualizarEvolucao() -> impl IntoView {
@@ -145,9 +143,8 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
 fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
     let ping_action = Action::new(|paciente: &PacienteCadastroSummary| {
         let paciente = paciente.clone();
-        async move {        
-            srv_paciente_cadastro_summary_ping(paciente).await
-    }});
+        async move { srv_paciente_cadastro_summary_ping(paciente).await }
+    });
 
     let paciente = paciente.clone();
     let _ = ping_action.dispatch(paciente);
@@ -166,7 +163,6 @@ fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
 
         </Suspense>
     }
-    
 }
 
 #[component]
@@ -175,7 +171,7 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
         let evolucao_id = query_evolucao_id();
 
         let evolucao = get_evolucao(evolucao_id.into());
-    
+
         view! {
             <Suspense>
                 <p>SIDEBAR</p>
@@ -196,7 +192,12 @@ type EvolucaoId = String;
 pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
     let params = use_params::<PacienteParams>();
 
-    Memo::new(move |_| params.get().map(|p| p.paciente_id).map_err(|e| e.to_string()))
+    Memo::new(move |_| {
+        params
+            .get()
+            .map(|p| p.paciente_id)
+            .map_err(|e| e.to_string())
+    })
 }
 
 #[derive(Params, PartialEq, Clone)]
@@ -207,7 +208,12 @@ struct PacienteParams {
 pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
     let params = use_params::<EvolucaoParams>();
 
-    Memo::new(move |_| params.get().map(|p| p.evolucao_id).map_err(|e| e.to_string()))
+    Memo::new(move |_| {
+        params
+            .get()
+            .map(|p| p.evolucao_id)
+            .map_err(|e| e.to_string())
+    })
 }
 
 #[derive(Params, PartialEq, Clone)]
@@ -223,14 +229,13 @@ pub fn get_paciente_cadastro_summary(
         |query_id| async move {
             match query_id {
                 Ok(paciente_id) => srv_load_paciente_cadastro_summary(paciente_id)
-                .await
-                .map_err(|e| e.to_string()),
+                    .await
+                    .map_err(|e| e.to_string()),
                 Err(e) => Err(e),
             }
         },
     )
 }
-
 
 pub fn get_evolucao(
     evolucao_id: MaybeSignal<Result<EvolucaoId, String>>,
@@ -259,30 +264,34 @@ pub async fn srv_load_paciente_cadastro_summary(
         id: paciente_id,
         nome: Some("John Doe".to_string()),
     })
-
 }
 
 #[server(PacienteCadastroSummaryPingSrv)]
-pub async fn srv_paciente_cadastro_summary_ping(paciente: PacienteCadastroSummary) -> Result<String, ServerFnError<String>> {
+pub async fn srv_paciente_cadastro_summary_ping(
+    paciente: PacienteCadastroSummary,
+) -> Result<String, ServerFnError<String>> {
     let status = if paciente.id == "pppppppp" {
         "CORRECT"
     } else {
         "INCORRECT"
     };
-    Ok("Pong paciente_id: ".to_string() + &paciente.id.to_string() + "; Server Side Data Status: " + status)
+    Ok("Pong paciente_id: ".to_string()
+        + &paciente.id.to_string()
+        + "; Server Side Data Status: "
+        + status)
 }
 
 #[server(LoadLastEvolucaoSrv)]
 async fn srv_load_evolucao(
     evolucao_id: EvolucaoId,
 ) -> Result<EvolucaoSoapFull, ServerFnError<String>> {
-// fake API delay
-tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+    // fake API delay
+    tokio::time::sleep(std::time::Duration::from_millis(250)).await;
 
-Ok(EvolucaoSoapFull {
-    id: evolucao_id,
-    paciente_id: PacienteId::from("pppppppp"), 
-})
+    Ok(EvolucaoSoapFull {
+        id: evolucao_id,
+        paciente_id: PacienteId::from("pppppppp"),
+    })
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
