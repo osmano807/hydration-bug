@@ -161,7 +161,7 @@ fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
 
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
-    let sidebar = || {
+    let Sidebar = || {
         let evolucao_id = query_evolucao_id();
 
         let _evolucao = get_evolucao(evolucao_id.into());
@@ -173,10 +173,20 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
         }
     };
 
+    // Works
+    /*
     view! {
         <Outlet />
 
-        {sidebar}
+        <Sidebar />
+    }
+   */
+  
+    // Don't work (manifests bug)
+    view! {
+        <Outlet />
+
+        {Sidebar}
     }
 }
 
