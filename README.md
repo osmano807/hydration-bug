@@ -14,7 +14,7 @@ We are actively investigating the issue. It appears to only manifest in the firs
 ## Steps to Reproduce
 
 1. Build and serve the project with `cargo leptos serve`
-2. Go in a browser to http://127.0.0.1:8000/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/eeeeeeee
+2. Go in a browser to http://127.0.0.1:8000/bug
 3. Notice that in the browser console output there's a `PacienteCadastroSummary` with wrong data, namely:
 
 ```
@@ -22,7 +22,7 @@ paciente: Some(
     Ok(
         PacienteCadastroSummary {
             id: PacienteId(
-                "odz3esz5",
+                "eeeeeeee",
             ),
             nome: None,
             data_nascimento: None,

@@ -34,7 +34,7 @@ pub fn App() -> impl IntoView {
                 <ParentRoute path=path!("") view=DrawerAtendimentosMember>
                     <Route
                         path=path!(
-                            "/pacientes/:paciente_id/atendimentos/:atendimento_id/evolucoes/:evolucao_id"
+                            "/bug"
                         )
                         view=VisualizarEvolucao
                     />
@@ -47,11 +47,11 @@ pub fn App() -> impl IntoView {
 #[component]
 fn Home() -> impl IntoView {
     view! {
-        <A href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/eeeeeeee">
+        <A href="/bug">
             Go to the bug page (client side navigation)
         </A>
         <br />
-        <a href="/pacientes/pppppppp/atendimentos/aaaaaaaa/evolucoes/eeeeeeee">
+        <a href="/bug">
             Go to the bug page (browser native navigation)
         </a>
     }
@@ -71,7 +71,7 @@ pub fn VisualizarEvolucao() -> impl IntoView {
                     Some(Ok(_evolucao)) => {
                         Either::Left(
                             view! {
-                                <h1 class="text-2xl font-bold">Evolução</h1>
+                                <h1 class="text-2xl font-bold">Hydration Bug</h1>
                                 <Cabecalho />
                             },
                         )
