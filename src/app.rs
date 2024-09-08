@@ -50,9 +50,12 @@ fn Home() -> impl IntoView {
 
 #[component]
 pub fn VisualizarEvolucao() -> impl IntoView {
-    let evolucao_id = Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")));
+    let evolucao_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(EvolucaoId::from("eeeeeeee")));
 
-    let evolucao = get_evolucao(evolucao_id.into());
+    let evolucao = Resource::new(
+        move || evolucao_id.get(),
+        |_| async move { srv_load_evolucao().await },
+    );
 
     view! {
         <Suspense>
@@ -79,8 +82,11 @@ pub fn VisualizarEvolucao() -> impl IntoView {
 
 #[component]
 pub fn Cabecalho() -> impl IntoView {
-    let paciente_id = Memo::new(|_| Ok(PacienteId::from("pppppppp")));
-    let paciente = get_paciente_cadastro_summary(paciente_id.into());
+    let paciente_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(PacienteId::from("pppppppp")));
+    let paciente = Resource::new(
+        move || paciente_id.get(),
+        |_| async move { srv_load_paciente_cadastro_summary().await },
+    );
 
     view! {
         <Suspense>
@@ -127,9 +133,12 @@ pub fn Cabecalho() -> impl IntoView {
 #[component]
 pub fn DrawerAtendimentosMember() -> impl IntoView {
     let Sidebar = || {
-        let evolucao_id = Memo::new(|_| Ok(EvolucaoId::from("eeeeeeee")));
+        let evolucao_id = Memo::new(|_| Ok::<_, ServerFnError<String>>(EvolucaoId::from("eeeeeeee")));
 
-        let _evolucao = get_evolucao(evolucao_id.into());
+        let _evolucao = Resource::new(
+            move || evolucao_id.get(),
+            |_| async move { srv_load_evolucao().await },
+        );
 
         view! {
             <Suspense>
@@ -198,24 +207,6 @@ pub async fn srv_paciente_cadastro_summary_ping(
 
 type PacienteId = String;
 type EvolucaoId = String;
-
-pub fn get_paciente_cadastro_summary(
-    paciente_id: MaybeSignal<Result<PacienteId, String>>,
-) -> Resource<Result<PacienteCadastroSummary, ServerFnError<String>>> {
-    Resource::new(
-        move || paciente_id.get(),
-        |_| async move { srv_load_paciente_cadastro_summary().await },
-    )
-}
-
-pub fn get_evolucao(
-    evolucao_id: MaybeSignal<Result<EvolucaoId, String>>,
-) -> Resource<Result<EvolucaoSoapFull, ServerFnError<String>>> {
-    Resource::new(
-        move || evolucao_id.get(),
-        |_| async move { srv_load_evolucao().await },
-    )
-}
 
 #[server(LoadPacienteCadastroSummarySrv)]
 pub async fn srv_load_paciente_cadastro_summary(
