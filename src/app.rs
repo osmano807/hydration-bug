@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags};
-use leptos_router::{components::*, hooks::use_params, params::Params, path};
+use leptos_router::{components::*, path};
 
 use leptos::either::Either;
 use serde::{Deserialize, Serialize};
@@ -181,7 +181,7 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
         <Sidebar />
     }
    */
-  
+
     // Don't work (manifests bug)
     view! {
         <Outlet />
@@ -194,35 +194,15 @@ type PacienteId = String;
 type EvolucaoId = String;
 
 pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
-    let params = use_params::<PacienteParams>();
-
-    Memo::new(move |_| {
-        params
-            .get()
-            .map(|p| p.paciente_id)
-            .map_err(|e| e.to_string())
+    Memo::new( |_| {
+        Ok(PacienteId::from("pppppppp"))
     })
-}
-
-#[derive(Params, PartialEq, Clone)]
-struct PacienteParams {
-    paciente_id: PacienteId,
 }
 
 pub fn query_evolucao_id() -> Memo<Result<EvolucaoId, String>> {
-    let params = use_params::<EvolucaoParams>();
-
-    Memo::new(move |_| {
-        params
-            .get()
-            .map(|p| p.evolucao_id)
-            .map_err(|e| e.to_string())
+    Memo::new(|_| {
+        Ok(EvolucaoId::from("eeeeeeee"))
     })
-}
-
-#[derive(Params, PartialEq, Clone)]
-struct EvolucaoParams {
-    evolucao_id: EvolucaoId,
 }
 
 pub fn get_paciente_cadastro_summary(
