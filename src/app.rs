@@ -29,9 +29,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <Router>
-            <Routes fallback=|| {
-                view! {}
-            }>
+            <Routes fallback=|| ()>
                 <ParentRoute path=path!("") view=DrawerAtendimentosMember>
                     <Route
                         path=path!(
@@ -68,8 +66,8 @@ pub fn VisualizarEvolucao() -> impl IntoView {
         <Suspense>
             {move || {
                 let evolucao = evolucao.get();
-                match (evolucao) {
-                    (Some(Ok(evolucao))) => {
+                match evolucao {
+                    Some(Ok(_evolucao)) => {
                         Either::Left(
                             view! {
                                 <h1 class="text-2xl font-bold">Evolução</h1>
@@ -102,8 +100,8 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
             {move || {
                 let paciente = paciente.get();
                 tracing::debug!("paciente: {:#?}", paciente);
-                match (paciente) {
-                    (Some(Ok(paciente))) => {
+                match paciente {
+                    Some(Ok(paciente)) => {
                         let paciente_clone = paciente.clone();
                         let paciente_id_clone = paciente.id.clone();
                         tracing::debug!("paciente: {:#?}", paciente);
@@ -170,7 +168,7 @@ pub fn DrawerAtendimentosMember() -> impl IntoView {
     let sidebar = || {
         let evolucao_id = query_evolucao_id();
 
-        let evolucao = get_evolucao(evolucao_id.into());
+        let _evolucao = get_evolucao(evolucao_id.into());
 
         view! {
             <Suspense>
