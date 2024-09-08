@@ -9,12 +9,12 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 axum = { version = "0.7", optional = true }
 console_error_panic_hook = "0.1"
-leptos = { path = "/home/opc/Documents/leptos/leptos", features = ["nightly"] }
-leptos_meta = { path = "/home/opc/Documents/leptos/meta" }
-leptos_router = { path = "/home/opc/Documents/leptos/router", features = [
+leptos = { git = "https://github.com/leptos-rs/leptos", features = ["nightly"] }
+leptos_meta = { git = "https://github.com/leptos-rs/leptos" }
+leptos_router = { git = "https://github.com/leptos-rs/leptos", features = [
   "nightly",
 ] }
-leptos_axum = { path = "/home/opc/Documents/leptos/integrations/axum", optional = true }
+leptos_axum = { git = "https://github.com/leptos-rs/leptos", optional = true }
 
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
 tower = { version = "0.4", optional = true }
@@ -46,10 +46,10 @@ getrandom = { version = "0.2", features = [
 nanoid = "0.4"
 
 [patch.crates-io]
-leptos = { path = "/home/opc/Documents/leptos/leptos" }
-leptos_meta = { path = "/home/opc/Documents/leptos/meta" }
-leptos_router = { path = "/home/opc/Documents/leptos/router" }
-leptos_axum = { path = "/home/opc/Documents/leptos/integrations/axum" }
+leptos = { git = "https://github.com/leptos-rs/leptos" }
+leptos_meta = { git = "https://github.com/leptos-rs/leptos" }
+leptos_router = { git = "https://github.com/leptos-rs/leptos" }
+leptos_axum = { git = "https://github.com/leptos-rs/leptos" }
 
 [features]
 hydrate = ["leptos/hydrate", "dep:tracing-wasm"]
@@ -92,10 +92,10 @@ style-file = "style/main.scss"
 assets-dir = "public"
 
 # The IP and port (ex: 127.0.0.1:3000) where the server serves the content. Use it in your server setup.
-site-addr = "127.0.0.1:3000"
+site-addr = "127.0.0.1:8000"
 
 # The port to use for automatic reload monitoring
-reload-port = 3001
+reload-port = 8001
 
 # [Optional] Command to use when running end2end tests. It will run in the end2end dir.
 #   [Windows] for non-WSL use "npx.cmd playwright test"
