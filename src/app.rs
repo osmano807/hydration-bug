@@ -2,7 +2,6 @@ use leptos::prelude::*;
 use leptos_meta::{provide_meta_context, MetaTags};
 use leptos_router::{components::*, path, MatchNestedRoutes, params::Params, hooks::use_params};
 
-use time::{Date, OffsetDateTime};
 use serde::{Serialize, Deserialize};
 use leptos::either::Either;
 
@@ -122,20 +121,12 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                         Either::Left({
                             view! {
                                 <p>Paciente: {paciente.nome}</p>
-                                <p>Id: {paciente.id.to_string()}</p>
-                                <p>
-                                    Data de nascimento:
-                                    {paciente
-                                        .data_nascimento
-                                        .map(|date| date.to_string())
-                                        .unwrap_or_default()}
-                                </p>
-                                <p>CPF: {paciente.cpf}</p>
+                                <p>Id: {paciente.id.to_string()}</p>                        
                                 <PingResult paciente=paciente_clone />
                                 <p>
                                     Client Side Data Status:
                                     {move || {
-                                        if paciente.id.to_string() == "pppppppp" {
+                                        if paciente.id == "pppppppp" {
                                             tracing::debug!("Data Status CORRECT");
                                             Either::Left(view! { <span>CORRECT</span> })
                                         } else {
@@ -146,7 +137,7 @@ pub fn CabecalhoPacienteAtendimento() -> impl IntoView {
                                 </p>
                                 {move || {
                                     tracing::warn!(
-                                        "paciente id correct?: {:#?}", paciente_id_clone.to_string() == "pppppppp"
+                                        "paciente id correct?: {:#?}", paciente_id_clone == "pppppppp"
                                     )
                                 }}
                             }
@@ -217,7 +208,6 @@ fn DrawerGeneric(sidebar: impl IntoView) -> impl IntoView {
 
 type PacienteId = String;
 type EvolucaoId = String;
-type AtendimentoId = String;
 
 pub fn query_paciente_id() -> Memo<Result<PacienteId, String>> {
     let params = use_params::<PacienteParams>();
@@ -284,15 +274,13 @@ pub async fn srv_load_paciente_cadastro_summary(
     Ok(PacienteCadastroSummary {
         id: paciente_id,
         nome: Some("John Doe".to_string()),
-        data_nascimento: Some(Date::from_calendar_date(1980, time::Month::January, 1).unwrap()),
-        cpf: Some("999.999.999-99".to_string()),
     })
 
 }
 
 #[server(PacienteCadastroSummaryPingSrv)]
 pub async fn srv_paciente_cadastro_summary_ping(paciente: PacienteCadastroSummary) -> Result<String, ServerFnError<String>> {
-    let status = if paciente.id.to_string() == "pppppppp" {
+    let status = if paciente.id == "pppppppp" {
         "CORRECT"
     } else {
         "INCORRECT"
@@ -309,15 +297,7 @@ tokio::time::sleep(std::time::Duration::from_millis(250)).await;
 
 Ok(EvolucaoSoapFull {
     id: evolucao_id,
-    paciente_id: PacienteId::try_from("pppppppp").unwrap(),
-    atendimento_id: AtendimentoId::try_from("aaaaaaaa").unwrap(),
-    subjetivo: Some("Subjetivo".to_string()),
-    objetivo: Some("Objetivo".to_string()),
-    analise: Some("Análise".to_string()),
-    plano: Some("Plano".to_string()),
-    data_criacao: OffsetDateTime::now_utc(),
-    data_modificacao: OffsetDateTime::now_utc(),
-    
+    paciente_id: PacienteId::from("pppppppp"), 
 })
 }
 
@@ -325,19 +305,10 @@ Ok(EvolucaoSoapFull {
 pub struct PacienteCadastroSummary {
     pub id: PacienteId,
     pub nome: Option<String>,
-    pub data_nascimento: Option<Date>,
-    pub cpf: Option<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct EvolucaoSoapFull {
     pub id: EvolucaoId,
     pub paciente_id: PacienteId,
-    pub atendimento_id: AtendimentoId,
-    pub subjetivo: Option<String>,
-    pub objetivo: Option<String>,
-    pub analise: Option<String>,
-    pub plano: Option<String>,
-    pub data_criacao: OffsetDateTime,
-    pub data_modificacao: OffsetDateTime,
 }
