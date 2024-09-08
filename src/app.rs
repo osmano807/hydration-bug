@@ -90,30 +90,14 @@ pub fn Cabecalho() -> impl IntoView {
                 match paciente {
                     Some(Ok(paciente)) => {
                         let paciente_clone = paciente.clone();
-                        let paciente_id_clone = paciente.id.clone();
+                        let paciente_clone2 = paciente.clone();
                         tracing::debug!("paciente: {:#?}", paciente);
                         Either::Left({
                             view! {
                                 <p>Paciente: {paciente.nome}</p>
                                 <p>Id: {paciente.id.to_string()}</p>
                                 <PingResult paciente=paciente_clone />
-                                <p>
-                                    Client Side Data Status:
-                                    {move || {
-                                        if paciente.id == "pppppppp" {
-                                            tracing::debug!("Data Status CORRECT");
-                                            Either::Left(view! { <span>CORRECT</span> })
-                                        } else {
-                                            tracing::debug!("Data Status INCORRECT");
-                                            Either::Right(view! { <span>INCORRECT</span> })
-                                        }
-                                    }}
-                                </p>
-                                {move || {
-                                    tracing::warn!(
-                                        "paciente id correct?: {:#?}", paciente_id_clone == "pppppppp"
-                                    )
-                                }}
+                                <ClientSideDataStatus paciente=paciente_clone2 />
                             }
                         })
                     }
@@ -176,6 +160,26 @@ fn PingResult(paciente: PacienteCadastroSummary) -> impl IntoView {
             </p>
 
         </Suspense>
+    }
+}
+
+#[component]
+fn ClientSideDataStatus(paciente: PacienteCadastroSummary) -> impl IntoView {
+    let paciente_id = paciente.id.clone();
+    view! {
+        <p>
+            Client Side Data Status:
+            {move || {
+                if paciente.id == "pppppppp" {
+                    tracing::debug!("Data Status CORRECT");
+                    Either::Left(view! { <span>CORRECT</span> })
+                } else {
+                    tracing::debug!("Data Status INCORRECT");
+                    Either::Right(view! { <span>INCORRECT</span> })
+                }
+            }}
+        </p>
+        {move || { tracing::warn!("paciente id correct?: {:#?}", paciente_id == "pppppppp") }}
     }
 }
 
